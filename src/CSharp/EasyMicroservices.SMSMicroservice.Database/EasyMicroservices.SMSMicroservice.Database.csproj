@@ -5,4 +5,9 @@
     <RootNamespace>EasyMicroservices.SMSMicroservice</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Contexts\" />
+    <Folder Include="Database\Documents\" />
+  </ItemGroup>
+
 </Project>
