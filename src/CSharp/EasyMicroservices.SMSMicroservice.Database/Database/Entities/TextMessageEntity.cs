@@ -1,10 +1,11 @@
-﻿using EasyMicroservices.SMSMicroservice.Database.Entities.ManyToMany;
+﻿using EasyMicroservices.Cores.Database.Interfaces;
+using EasyMicroservices.SMSMicroservice.Database.Entities.ManyToMany;
 using EasyMicroservices.SMSMicroservice.Database.Schemas;
 using System.Collections.Generic;
 
 namespace EasyMicroservices.SMSMicroservice.Database.Entities
 {
-    public class TextMessageEntity : TextMessageSchema
+    public class TextMessageEntity : TextMessageSchema, IIdSchema<long>
     {
         public long Id { get; set; }
 
