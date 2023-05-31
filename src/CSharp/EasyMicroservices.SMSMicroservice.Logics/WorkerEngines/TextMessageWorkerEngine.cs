@@ -1,17 +1,28 @@
 ﻿using EasyMicroservices.Mapper.Interfaces;
+using EasyMicroservices.ServiceContracts;
 using EasyMicroservices.SMS.Interfaces;
 using EasyMicroservices.SMS.Models.Requests;
 using EasyMicroservices.SMSMicroservice.Database.Entities;
 using EasyMicroservices.SMSMicroservice.DatabaseLogics;
 using EasyMicroservices.SMSMicroservice.DataTypes;
+using EasyMicroservices.SMSMicroservice.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace EasyMicroservices.SMSMicroservice.WorkerEngines
 {
     public class TextMessageWorkerEngine
     {
+        readonly IDependencyManager _dependencyManager;
+
+        public TextMessageWorkerEngine(IDependencyManager dependencyManager)
+        {
+            _dependencyManager = dependencyManager;
+        }
+
         public async Task Start(TimeSpan delayWhenEmpty)
         {
             while (true)
@@ -27,7 +38,7 @@ namespace EasyMicroservices.SMSMicroservice.WorkerEngines
         {
             try
             {
-                await using TextMessageDatabaseLogic logic = new TextMessageDatabaseLogic();
+                await using var logic = TextMessageDatabaseLogic.CreateInstance(_dependencyManager);
 
                 var queueMessageToSend = await TakeFromQueue(logic);
 
@@ -42,7 +53,8 @@ namespace EasyMicroservices.SMSMicroservice.WorkerEngines
                         //save exception message to db
                     }
                     await logic.Update(textMessage);
-                    return true;
+                    await logic.SaveChangesAsync();
+                    return textMessage.Status == MessageStatusType.Sent;
                 }
                 else
                     return false;
@@ -56,13 +68,18 @@ namespace EasyMicroservices.SMSMicroservice.WorkerEngines
 
         Task<MessageContract<TextMessageEntity>> TakeFromQueue(TextMessageDatabaseLogic logic)
         {
-            return logic.GetBy(x => x.Status == MessageStatusType.Queue);
+            return logic.GetBy(x => x.Status == MessageStatusType.Queue,
+                q => q.Include(x => x.PhoneNumberTextMessages)
+                .ThenInclude(x => x.PhoneNumberModel)
+                .Include(x => x.MessageSenderTextMessages)
+                .ThenInclude(x => x.MessageSender)
+                );
         }
 
         async Task<MessageContract> SendMessage(TextMessageEntity textMessage)
         {
-            ISMSProvider smsProvider = default;
-            IMapperProvider mapperProvider = default;
+            ISMSProvider smsProvider = _dependencyManager.GetSMSProvider();
+            IMapperProvider mapperProvider = _dependencyManager.GetMapper();
             if (textMessage.PhoneNumberTextMessages.Count > 1)
             {
                 var request = mapperProvider.Map<MultipleTextMessageRequest>(textMessage);
