@@ -5,7 +5,7 @@
         public long PhoneNumberId { get; set; }
         public long TextMessageId { get; set; }
 
-        public PhoneNumberEntity PhoneNumber { get; set; }
+        public PhoneNumberModelEntity PhoneNumberModel { get; set; }
         public TextMessageEntity TextMessage { get; set; }
     }
 }
