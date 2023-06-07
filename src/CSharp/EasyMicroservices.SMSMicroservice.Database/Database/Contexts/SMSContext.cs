@@ -14,9 +14,7 @@ namespace EasyMicroservices.SMSMicroservice.Database.Contexts
 
         public DbSet<ApiUserEntity> ApiUsers { get; set; }
         public DbSet<MessageSenderEntity> MessageSenders { get; set; }
-        public DbSet<PhoneNumberModelEntity> PhoneNumberModels { get; set; }
         public DbSet<MessageSenderTextMessageEntity> MessageSenderTextMessages { get; set; }
-        public DbSet<PhoneNumberTextMessageEntity> PhoneNumberTextMessages { get; set; }
         public DbSet<TextMessageEntity> TextMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -44,11 +42,6 @@ namespace EasyMicroservices.SMSMicroservice.Database.Contexts
                    .HasForeignKey(x => x.ApiUserId).OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<PhoneNumberModelEntity>(model =>
-            {
-                model.HasKey(x => x.Id);
-            });
-
             modelBuilder.Entity<TextMessageEntity>(model =>
             {
                 model.HasKey(x => x.Id);
@@ -71,19 +64,6 @@ namespace EasyMicroservices.SMSMicroservice.Database.Contexts
 
                 model.HasOne(x => x.TextMessage)
                    .WithMany(x => x.MessageSenderTextMessages)
-                   .HasForeignKey(x => x.TextMessageId).OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<PhoneNumberTextMessageEntity>(model =>
-            {
-                model.HasKey(x => new { x.TextMessageId, x.PhoneNumberId });
-
-                model.HasOne(x => x.PhoneNumberModel)
-                   .WithMany(x => x.PhoneNumberTextMessages)
-                   .HasForeignKey(x => x.PhoneNumberId).OnDelete(DeleteBehavior.Restrict);
-
-                model.HasOne(x => x.TextMessage)
-                   .WithMany(x => x.PhoneNumberTextMessages)
                    .HasForeignKey(x => x.TextMessageId).OnDelete(DeleteBehavior.Restrict);
             });
         }

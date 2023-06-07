@@ -13,6 +13,5 @@ namespace EasyMicroservices.SMSMicroservice.Database.Entities
         public ApiUserEntity ApiUser { get; set; }
 
         public ICollection<MessageSenderTextMessageEntity> MessageSenderTextMessages { get; set; }
-        public ICollection<PhoneNumberTextMessageEntity> PhoneNumberTextMessages { get; set; }
     }
 }
