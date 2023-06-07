@@ -12,7 +12,7 @@ namespace EasyMicroservices.SMSMicroservice.Tests.Database
     {
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseInMemoryDatabase("SMS database");
+            optionsBuilder.UseInMemoryDatabase("SMS database test");
         }
     }
 }

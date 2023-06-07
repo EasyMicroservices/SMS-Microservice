@@ -47,30 +47,12 @@ namespace EasyMicroservices.SMSMicroservice.Tests.SMS
             return sender;
         }
 
-        async Task<PhoneNumberModelEntity> GetPhoneNumber(string phoneNumber)
-        {
-            var dbReader = GetReadableOf<PhoneNumberModelEntity>();
-            var phoneNumberModel = await dbReader.FirstOrDefaultAsync(x => x.Number == phoneNumber);
-            if (phoneNumberModel == null)
-            {
-                phoneNumberModel = new PhoneNumberModelEntity()
-                {
-                    Number = phoneNumber
-                };
-                var dbWriter = GetWritableOf<PhoneNumberModelEntity>();
-                await dbWriter.AddAsync(phoneNumberModel);
-                await dbWriter.SaveChangesAsync();
-            }
-            return phoneNumberModel;
-        }
-
         [Theory]
         [InlineData("+989111111111", "09391111111", "hello world")]
         public async Task SendTextMessageTest(string senderNumber, string sendTo, string message)
         {
             await CheckStarted();
             var sender = await GetMessageSender(senderNumber);
-            var phoneNumberModel = await GetPhoneNumber(sendTo);
             var dbWriter = GetWritableOf<TextMessageEntity>();
 
             var entityResult = await dbWriter.AddAsync(new TextMessageEntity()
@@ -84,13 +66,7 @@ namespace EasyMicroservices.SMSMicroservice.Tests.SMS
                          MessageSenderId = sender.Id
                     }
                 },
-                PhoneNumberTextMessages = new List<PhoneNumberTextMessageEntity>()
-                {
-                    new  PhoneNumberTextMessageEntity()
-                    {
-                        PhoneNumberId = phoneNumberModel.Id
-                    }
-                },
+                ToPhoneNumbers = sendTo,
                 Status = DataTypes.MessageStatusType.Queue
             });
             await dbWriter.SaveChangesAsync();
