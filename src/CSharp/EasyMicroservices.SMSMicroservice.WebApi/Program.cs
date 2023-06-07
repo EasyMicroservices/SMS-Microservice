@@ -2,6 +2,8 @@
 using EasyMicroservices.Cores.Database.Interfaces;
 using EasyMicroservices.SMSMicroservice.Contracts.Common;
 using EasyMicroservices.SMSMicroservice.Contracts.Requests;
+using EasyMicroservices.SMSMicroservice.Database;
+using EasyMicroservices.SMSMicroservice.Database.Contexts;
 using EasyMicroservices.SMSMicroservice.Database.Entities;
 using EasyMicroservices.SMSMicroservice.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +26,9 @@ namespace EasyMicroservices.SMSMicroservice.WebApi
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped((serviceProvider) => new DependencyManager().GetContractLogic<TextMessageEntity, SingleTextMessageRequestContract, TextMessageContract>());
             builder.Services.AddHttpContextAccessor();
-            
+            //builder.Services.AddDbContext<SMSContext>(options => new DatabaseBuilder().OnConfiguring(options));
+            builder.Services.AddScoped<IDatabaseBuilder>(serviceProvider => new DatabaseBuilder());
+
             var app = builder.Build();
             app.UseDeveloperExceptionPage();
             // Configure the HTTP request pipeline.

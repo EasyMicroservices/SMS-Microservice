@@ -7,7 +7,7 @@ namespace EasyMicroservices.SMSMicroservice.Database.Contexts
     public class SMSContext : DbContext
     {
         IDatabaseBuilder _builder;
-        public SMSContext(IDatabaseBuilder builder = default)
+        public SMSContext(IDatabaseBuilder builder)
         {
             _builder = builder;
         }
