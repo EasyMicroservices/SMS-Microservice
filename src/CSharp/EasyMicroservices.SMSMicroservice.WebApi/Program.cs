@@ -1,9 +1,18 @@
 
+using EasyMicroservices.Cores.Database.Interfaces;
+using EasyMicroservices.SMSMicroservice.Contracts.Common;
+using EasyMicroservices.SMSMicroservice.Contracts.Requests;
+using EasyMicroservices.SMSMicroservice.Database.Entities;
+using EasyMicroservices.SMSMicroservice.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace EasyMicroservices.SMSMicroservice.WebApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +22,11 @@ namespace EasyMicroservices.SMSMicroservice.WebApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddScoped((serviceProvider) => new DependencyManager().GetContractLogic<TextMessageEntity, SingleTextMessageRequestContract, TextMessageContract>());
+            builder.Services.AddHttpContextAccessor();
+            
             var app = builder.Build();
-
+            app.UseDeveloperExceptionPage();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -29,7 +40,8 @@ namespace EasyMicroservices.SMSMicroservice.WebApi
 
 
             app.MapControllers();
-
+            StartUp startUp = new StartUp();
+            await  startUp.Run(new DependencyManager());
             app.Run();
         }
     }
