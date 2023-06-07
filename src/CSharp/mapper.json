@@ -1,0 +1,102 @@
+﻿{
+  "Environments": [
+    {
+      "Name": "SMSMicroservice",
+      "GenerationPath": "D:\\Github\\EasyMicroservices\\Microservices\\SMS\\src\\CSharp\\EasyMicroservices.SMSMicroservice.Logics\\Mappers",
+      "BuildPath": "D:\\Github\\EasyMicroservices\\Microservices\\SMS\\src\\CSharp\\EasyMicroservices.SMSMicroservice.WebApi\\bin\\Debug\\net7.0",
+      "NameSpaces": [
+        "EasyMicroservices.Mapper.Interfaces",
+        "EasyMicroservices.Mapper.CompileTimeMapper.Interfaces",
+		"System.Linq",
+		"EasyMicroservices.SMSMicroservice.DatabaseLogics"
+      ],
+      "Groups": [
+        {
+          "DisplayName": "TextMessageEntity",
+          "MapFrom": {
+            "Name": "TextMessageEntity",
+            "Namespace": "EasyMicroservices.SMSMicroservice.Database.Entities",
+            "AssebmlyFileName": "EasyMicroservices.SMSMicroservice.Database.dll"
+
+          },
+          "MapTo": {
+            "Name": "SingleTextMessageRequestContract",
+            "Namespace": "EasyMicroservices.SMSMicroservice.Contracts.Requests",
+            "AssebmlyFileName": "EasyMicroservices.SMSMicroservice.Domain.dll"
+          },
+          "SkippedProperties": [
+			  {
+				  "Name": "Id"
+			  },
+			  {
+				  "Name": "ApiUserId"
+			  },
+			  {
+				  "Name": "ApiUser"
+			  },
+			  {
+				  "Name": "MessageSenderTextMessages"
+			  }
+          ],
+          "CustomProperties": [
+			  {
+				  "FromName": "ToPhoneNumbers",
+				  "ToName": "ToPhoneNumber"
+			  },
+			  {
+				  "FromName": "Senders",
+				  "ToName": "$fromObject.MessageSenderTextMessages.Select(x => x.MessageSender.PhoneNumber).ToList()"
+			  },
+			  {
+				  "FromName": "Status",
+				  "ToName": "$EasyMicroservices.SMSMicroservice.DataTypes.MessageStatusType.Queue"
+			  }
+          ],
+		  "FromDirectCodeAsyncMap": "            mapped.MessageSenderTextMessages = await MessageSenderTextMessageDatabaseLogic.GetMessageSenders(fromObject.Senders.ToArray());"
+        },
+		{
+          "DisplayName": "TextMessageEntity",
+          "MapFrom": {
+            "Name": "TextMessageEntity",
+            "Namespace": "EasyMicroservices.SMSMicroservice.Database.Entities",
+            "AssebmlyFileName": "EasyMicroservices.SMSMicroservice.Database.dll"
+
+          },
+          "MapTo": {
+            "Name": "SingleTextMessageRequest",
+            "Namespace": "EasyMicroservices.SMS.Models.Requests",
+            "AssebmlyFileName": "EasyMicroservices.SMS.dll"
+          },
+          "SkippedProperties": [
+			  {
+				  "Name": "Id"
+			  },
+			  {
+				  "Name": "ApiUserId"
+			  },
+			  {
+				  "Name": "ApiUser"
+			  },
+			  {
+				  "Name": "MessageSenderTextMessages"
+			  }
+          ],
+          "CustomProperties": [
+			  {
+				  "FromName": "ToPhoneNumbers",
+				  "ToName": "ToNumber"
+			  },
+			  {
+				  "FromName": "Senders",
+				  "ToName": "$fromObject.MessageSenderTextMessages.Select(x => x.MessageSender.PhoneNumber).ToList()"
+			  },
+			  {
+				  "FromName": "Status",
+				  "ToName": "$EasyMicroservices.SMSMicroservice.DataTypes.MessageStatusType.Queue"
+			  }
+          ]
+        }
+      ]
+    }
+  ]
+}
