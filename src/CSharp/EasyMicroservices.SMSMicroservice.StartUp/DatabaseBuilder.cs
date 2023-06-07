@@ -7,7 +7,8 @@ namespace EasyMicroservices.SMSMicroservice
     {
         public void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("connection string");
+            optionsBuilder.UseInMemoryDatabase("SMS database");
+            //optionsBuilder.UseSqlServer("connection string");
         }
     }
 }
