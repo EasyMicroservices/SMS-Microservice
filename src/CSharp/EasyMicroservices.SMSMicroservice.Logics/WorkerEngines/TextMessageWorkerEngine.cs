@@ -2,6 +2,7 @@
 using EasyMicroservices.ServiceContracts;
 using EasyMicroservices.SMS.Interfaces;
 using EasyMicroservices.SMS.Models.Requests;
+using EasyMicroservices.SMS.Models.Responses;
 using EasyMicroservices.SMSMicroservice.Database.Entities;
 using EasyMicroservices.SMSMicroservice.DatabaseLogics;
 using EasyMicroservices.SMSMicroservice.DataTypes;
@@ -9,7 +10,7 @@ using EasyMicroservices.SMSMicroservice.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using ServiceContracts;
 using System;
-using System.Net.Http;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace EasyMicroservices.SMSMicroservice.WorkerEngines
@@ -69,9 +70,7 @@ namespace EasyMicroservices.SMSMicroservice.WorkerEngines
         Task<MessageContract<TextMessageEntity>> TakeFromQueue(TextMessageDatabaseLogic logic)
         {
             return logic.GetBy(x => x.Status == MessageStatusType.Queue,
-                q => q.Include(x => x.PhoneNumberTextMessages)
-                .ThenInclude(x => x.PhoneNumberModel)
-                .Include(x => x.MessageSenderTextMessages)
+                q => q.Include(x => x.MessageSenderTextMessages)
                 .ThenInclude(x => x.MessageSender)
                 );
         }
@@ -80,20 +79,23 @@ namespace EasyMicroservices.SMSMicroservice.WorkerEngines
         {
             ISMSProvider smsProvider = _dependencyManager.GetSMSProvider();
             IMapperProvider mapperProvider = _dependencyManager.GetMapper();
-            if (textMessage.PhoneNumberTextMessages.Count > 1)
+            var toPhoneNumbers = textMessage.ToPhoneNumbers.Split(',').Select(x => x.Trim()).ToArray();
+            MessageResponse messageResponse = default;
+            if (toPhoneNumbers.Length > 1)
             {
                 var request = mapperProvider.Map<MultipleTextMessageRequest>(textMessage);
-                var sendSMSResponse = await smsProvider.SendMultipleAsync(request);
-                // save to db if exception
-                return sendSMSResponse.IsSuccess;
+                messageResponse = await smsProvider.SendMultipleAsync(request);
             }
             else
             {
                 var request = mapperProvider.Map<SingleTextMessageRequest>(textMessage);
-                var sendSMSResponse = await smsProvider.SendSingleAsync(request);
-                // save to db if exception
-                return sendSMSResponse.IsSuccess;
+                messageResponse = await smsProvider.SendSingleAsync(request);
             }
+            if (!messageResponse.IsSuccess)
+            {
+                return (FailedReasonType.WebServiceNotWorking, messageResponse.Error.Details);
+            }
+            return messageResponse.IsSuccess;
         }
     }
 }

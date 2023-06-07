@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -6,15 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EasyMicroservices.SMSMicroservice.Database\EasyMicroservices.SMSMicroservice.Database.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Logics\" />
+    <Folder Include="Mappers\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EasyMicroservices.SMS" Version="0.0.0.1" />
+    <PackageReference Include="EasyMicroservices.Mapper.CompileTimeMapper" Version="0.0.0.3" />
+    <PackageReference Include="EasyMicroservices.SMS" Version="0.0.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyMicroservices.SMSMicroservice.Database\EasyMicroservices.SMSMicroservice.Database.csproj" />
   </ItemGroup>
 
 </Project>
